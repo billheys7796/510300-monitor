@@ -1,0 +1,31 @@
+name: 510300 行情推送
+
+on:
+  schedule:
+    # UTC 时间：每30分钟，周一至周五 1:00-7:59
+    # 对应北京时间 9:00-15:59（脚本内再精确过滤到 9:25-15:05）
+    - cron: '*/30 1-7 * * 1-5'
+  # 允许手动触发测试
+  workflow_dispatch:
+
+jobs:
+  push-quote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 获取行情并推送
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: python fetch_and_push.py
