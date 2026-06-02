@@ -7,6 +7,15 @@ on:
     - cron: '*/30 1-7 * * 1-5'
   # 允许手动触发测试
   workflow_dispatch:
+    inputs:
+      force_push:
+        description: '强制推送（忽略交易时间检查）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -31,4 +40,5 @@ jobs:
       - name: 获取行情并推送
         env:
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          FORCE_PUSH: ${{ github.event_name == 'workflow_dispatch' && inputs.force_push || 'false' }}
         run: python fetch_and_push.py
