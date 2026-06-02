@@ -93,10 +93,11 @@ def push_to_wechat(token, title, content):
 # ── 主流程 ──
 
 def main():
-    # 检查交易时间
-    if not is_trading_time():
+    # 检查交易时间（FORCE_PUSH 环境变量可跳过此检查，用于手动测试）
+    force = os.environ.get("FORCE_PUSH", "").lower() == "true"
+    if not force and not is_trading_time():
         now = datetime.now(BJT).strftime('%Y-%m-%d %H:%M')
-        print(f"[{now}] 非交易时段，跳过推送")
+        print(f"[{now}] 非交易时段，跳过推送（设置 FORCE_PUSH=true 可强制推送）")
         return
 
     # 检查 Token
